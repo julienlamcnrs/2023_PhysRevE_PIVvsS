@@ -1,0 +1,4 @@
+#!/bin/bash
+
+lmp_mpi  -i input.lmp 
+

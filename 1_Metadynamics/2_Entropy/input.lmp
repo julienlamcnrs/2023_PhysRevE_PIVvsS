@@ -1,0 +1,43 @@
+variable	T		equal 0.75 
+variable        duration        equal 1.5E7 
+variable        save_period     equal ${duration}/2000
+
+units          	lj 
+dimension       3
+boundary        p p p
+read_restart	begin.restart
+
+mass            1 1
+mass            2 1
+
+reset_timestep 0
+
+pair_style      lj/cut 2.5              # Kobb Andersen 
+pair_coeff      1 1 1.0 1.00 2.5
+pair_coeff      2 2 0.5 0.88 2.5
+pair_coeff      1 2 1.5 0.80 2.5
+pair_modify     shift yes
+neighbor 	0.3 bin
+
+velocity 	all create ${T} 4501 
+
+fix 		myplumed all  plumed plumedfile "plumed.dat"
+fix             mynvt  all npt temp ${T} ${T} 1.0 iso 0 0 1.0
+run		10
+read_dump	dump.LIQ.lammpstrj 0 x y z
+reset_timestep	0
+
+restart 	${save_period}  file1 file2
+
+thermo		${save_period}
+
+dump            001 all atom ${save_period} dump.1.lammpstrj
+dump_modify	001 sort id
+run             ${duration}
+undump 		001
+
+dump            001 all atom ${save_period} dump.2.lammpstrj
+dump_modify	001 sort id
+run             ${duration}
+undump 		001
+

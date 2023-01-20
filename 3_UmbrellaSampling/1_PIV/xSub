@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+filename="List.txt"
+n=1
+for k in 5E5  1E6
+do
+       while read line; do
+               i=$( echo $line | awk '{print $1;}' )
+               file=$( echo $line | awk '{print $2;}' )
+               t=$( echo $line | awk '{print $3;}' )
+               S=$( echo $line | awk '{print $4;}' )
+               Z=$( echo $line | awk '{print $5;}' )
+               if [ ! -f "i"$i"/plumed.dat" ]; then
+                       echo  $file $t $i $S $E
+       		rm -i "i"$i
+                       mkdir   "i"$i
+                       cd      "i"$i
+                       cp ../zSrc/*    .
+                       sed -i 's?xfolder?'`pwd`'?'     xrun
+                       sed -i "s/xSeed/$RANDOM/g"      input.lmp
+                       sed -i "s/xTime/$t/g"           input.lmp
+                       sed -i "s/xT/$T/g"              input.lmp
+                       sed -i 's?xFile?'$file'?'       input.lmp
+                       sed -i "s/xS/$S/g"              plumed.dat
+                       sed -i "s/xK/$k/g"              plumed.dat
+                       mv xrun  "x"$i
+                       submitSimple "x"$i
+                       cd ../
+               fi
+
+       done < $filename
+done
+

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+OK1=0
+OK2=0
+for input_file in colvar??.out
+do
+        S_tmp=$( tail -n 1 $input_file | awk '{print $2}')
+        if [ 1 -eq "$(echo "${S_tmp} < 1.25" | bc)" ]
+        then
+                OK1=1
+                echo $folder $input_file "LIQ" 
+
+        fi
+        if [ 1 -eq "$(echo "${S_tmp} > 1.5" | bc)" ]
+        then
+                OK2=1
+                echo $folder $input_file "CRYS" 
+        fi
+done
+
+if [ 1 -eq "$(echo "${OK1} == 1" | bc)" ]
+then
+        if [ 1 -eq "$(echo "${OK2} == 1" | bc)" ]
+        then
+                echo $folder"/"$input_file
+        fi
+fi
